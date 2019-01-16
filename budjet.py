@@ -33,13 +33,15 @@ for file_name in os.listdir("./"):
         path = path.replace('\'', '\\') + '\\'
         path = path.rstrip('\\')
         print u'Конвертируем файл', path.decode('cp1251')
+        if file_name + "x" in os.listdir("./"):
+            continue
         convertXLStoXLSX(path)
 new_work_book_row += 1
 for file_name in os.listdir("./"):
     if all([file_name.endswith("xlsx"), file_name[0] != '~', file_name != 'budjet.xlsx', file_name != 'mat.xlsx',
-            file_name != 'meh.xlsx']):
+            file_name != 'meh.xlsx', file_name != 'value.xlsx']):
 
-        wb = load_workbook(file_name)
+        wb = load_workbook(file_name, data_only=True)
         sheet = wb.worksheets[0]
         obj = ''
         per = ''
@@ -53,8 +55,14 @@ for file_name in os.listdir("./"):
         rows = build_list(sheet)
 
         new_sheet.cell(new_work_book_row, 1).value = file_name.decode('cp1251')
-        coordinates = search_row(rows, [u'Объект'])[0]
-        new_sheet.cell(new_work_book_row, 2).value = rows[coordinates[0]][coordinates[1] + 1]
+        try:
+            coordinates = search_row(rows, [u'Объект'])[0]
+        except:
+            new_sheet.cell(new_work_book_row, 2).value = u'Неизвестно'
+        try:
+            new_sheet.cell(new_work_book_row, 2).value = rows[coordinates[0]][coordinates[1] + 1]
+        except:
+            new_sheet.cell(new_work_book_row, 2).value = u'Неизвестно'
 
         coordinates = search_row(rows, [u"Выполнено в", u"Работы выполнялись", u'Работы выполнены в'])
         if coordinates:
@@ -152,7 +160,7 @@ for file_name in os.listdir("./"):
             new_work_book_row) + '*0.05'
         new_sheet.cell(new_work_book_row, 21).value = '=N' + str(new_work_book_row) + '-G' + str(
             new_work_book_row) + '*0.05'
-        new_sheet.cell(new_work_book_row, 22).value = '=H' + str(new_work_book_row) + '*0.05'
+        new_sheet.cell(new_work_book_row, 22).value = '=H' + str(new_work_book_row) + '*0.95'
 
         new_sheet.cell(new_work_book_row, 23).value = '=P' + str(new_work_book_row) + '-I' + str(
             new_work_book_row) + '*0.05'
@@ -161,6 +169,13 @@ for file_name in os.listdir("./"):
         new_sheet.cell(new_work_book_row, 25).value = '=R' + str(new_work_book_row) + '-K' + str(
             new_work_book_row) + '*0.05'
 
+        new_work_book_row += 1
+        new_sheet.cell(new_work_book_row, 5).value = '=E' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 7).value = '=G' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 12).value = '=L' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 14).value = '=N' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 19).value = '=S' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 21).value = '=U' + str(new_work_book_row-1) + '*0.15'
         new_work_book_row += 1
 
 new_work_book.save('./budjet.xlsx')

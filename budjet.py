@@ -10,6 +10,15 @@ from funct import build_list, search_row, convertXLStoXLSX
 
 
 start_time = time.time()
+# read config with coef
+cofs=[]
+conf = open("cofvar.conf", "r")
+
+conf_lines = conf.readlines()
+for c in conf_lines:
+    if c.startswith('#'):
+        continue
+    cofs.append(c.rstrip())
 
 fcount = 0
 # create new xl doc
@@ -22,7 +31,7 @@ table_head = [u'Имя файла', u'Объект', u'Выполнено', u'Период отчета', u'ЗП К1',
               u'Материалы К1', u'НР К1', u'СП К1', u'НР и СП К1', u'ЗП К 0,98', u'ЭМ-ЗПМ К 0,98', u'ЗПМ К 0,98',
               u'Материалы К 0,98', u'НР К 0,98', u'СП К 0,98', u'НР и СП К 0,98', u'ЗП Договорная',
               u'ЭМ-ЗПМ Договорная', u'ЗПМ Договорная', u'Материалы Договорная', u'НР Договорная', u'СП Договорная',
-              u'НР и СП Договорная']
+              u'НР и СП Договорная', u'Затраты труда рабочих']
 
 for i in range(len(table_head)):
     new_sheet.cell(new_work_book_row, i + 1).value = table_head[i]
@@ -168,15 +177,32 @@ for file_name in os.listdir("./"):
             new_work_book_row) + '*0.05'
         new_sheet.cell(new_work_book_row, 25).value = '=R' + str(new_work_book_row) + '-K' + str(
             new_work_book_row) + '*0.05'
+        # Затраты труда рабочих
+        coordinates = search_row(rows, [u'Затраты труда рабочих'])
+        # print coordinates, rows[coordinates[0][0]][coordinates[0][1] + 1]
+        try:
+            new_sheet.cell(new_work_book_row, 26).value = rows[coordinates[0][0]][coordinates[0][1] + 1]
+        except:
+            new_sheet.cell(new_work_book_row, 26).value = u'Неизвестно'
 
+        row_num_t = new_work_book_row
         new_work_book_row += 1
-        new_sheet.cell(new_work_book_row, 5).value = '=E' + str(new_work_book_row-1) + '*0.15'
-        new_sheet.cell(new_work_book_row, 7).value = '=G' + str(new_work_book_row-1) + '*0.15'
-        new_sheet.cell(new_work_book_row, 12).value = '=L' + str(new_work_book_row-1) + '*0.15'
-        new_sheet.cell(new_work_book_row, 14).value = '=N' + str(new_work_book_row-1) + '*0.15'
-        new_sheet.cell(new_work_book_row, 19).value = '=S' + str(new_work_book_row-1) + '*0.15'
-        new_sheet.cell(new_work_book_row, 21).value = '=U' + str(new_work_book_row-1) + '*0.15'
+        new_sheet.cell(new_work_book_row, 4).value = u'ЗП * 0.15'
+        new_sheet.cell(new_work_book_row, 5).value = '=E' + str(row_num_t) + '*0.15'
+        new_sheet.cell(new_work_book_row, 7).value = '=G' + str(row_num_t) + '*0.15'
+        new_sheet.cell(new_work_book_row, 12).value = '=L' + str(row_num_t) + '*0.15'
+        new_sheet.cell(new_work_book_row, 14).value = '=N' + str(row_num_t) + '*0.15'
+        new_sheet.cell(new_work_book_row, 19).value = '=S' + str(row_num_t) + '*0.15'
+        new_sheet.cell(new_work_book_row, 21).value = '=U' + str(row_num_t) + '*0.15'
         new_work_book_row += 1
+        for _ in range(len(cofs)):
+            new_sheet.cell(new_work_book_row, 4).value = str(cofs[_])
+            for c in range(4, 26):
+                formula_string = '=' + str(chr(c + 65)) + str(row_num_t) + '*' + str(cofs[_]) + '+' + str(
+                    chr(c + 65)) + str(row_num_t + 1)
+                # print formula_string
+                new_sheet.cell(new_work_book_row, c + 1).value = formula_string
+            new_work_book_row += 1
 
 new_work_book.save('./budjet.xlsx')
 print fcount, 'files parsed for ',

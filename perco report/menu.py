@@ -140,7 +140,7 @@ def build_report():
         new_work_book_row = 1
         # new_work_book_col = 1
         # add table head
-        table_head = [u'Identifier', u'Serial.number', u'Date', u'Time', u'1 In, 2 Out']
+        table_head = [u'Identifier', u'Serial.number', u'Last Name', u'Date', u'Time', u'1 In, 2 Out']
 
         for i in range(len(table_head)):
             new_sheet.cell(new_work_book_row, i + 1).value = table_head[i]
@@ -148,7 +148,8 @@ def build_report():
 
         for s in STAFF:
             sn, nn = convert_indifer_to_serial_n(s[1])
-            cur.execute("select '" + str(s[1]) + "' , '" + str(sn) + "." + str(nn) + "', DATE_PASS, TIME_PASS, TYPE_PASS, STAFF_ID "
+            cur.execute("select '" + str(s[1]) + "' , '" + str(sn) + "." + str(nn) +"', '" + str(s[-2]) + "', DATE_PASS,"
+                " TIME_PASS, TYPE_PASS, STAFF_ID "
                 "from TABEL_INTERMEDIADATE "
                 "where DATE_PASS between '" + datetime.datetime.strptime(
                 period['start'], '%d.%m.%Y').strftime('%Y-%m-%d') + "' and '" + datetime.datetime.strptime(

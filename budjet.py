@@ -73,7 +73,7 @@ for file_name in os.listdir("./"):
         except:
             new_sheet.cell(new_work_book_row, 2).value = u'Неизвестно'
 
-        coordinates = search_row(rows, [u"Выполнено в", u"Работы выполнялись", u'Работы выполнены в'])
+        coordinates = search_row(rows, [u"Выполнено в", u"Работы выполнялись", u'Работы выполнены в', u'Выполнение'])
         if coordinates:
             new_sheet.cell(new_work_book_row, 3).value = rows[coordinates[0][0]][coordinates[0][1]]
         else:
